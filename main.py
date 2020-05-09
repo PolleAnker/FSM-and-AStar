@@ -65,6 +65,8 @@ while running:
                     g.obstacles.append(mpos)
             if event.button == 3:
                 start = mpos
+            if event.button == 2:
+                goal = mpos
             path = search_type(g, start, goal)
 
     pg.display.set_caption("fsAStar")
