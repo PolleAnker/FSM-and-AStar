@@ -24,7 +24,7 @@ def vec_to_int(v):
 
 
 # Heuristic / rule of thumb using Manhattan Distance
-def heuristic(node1, node2):
+def manhattan_dist(node1, node2):
     # Distance in straight line between the two nodes
     return (abs(node1.x - node2.x) + abs(node1.y - node2.y)) * 10 # multiply by 10 to keep in line with cost magnitudes
 
@@ -89,7 +89,7 @@ def a_star(graph, start, goal):
             next_cost = cost[current] + graph.cost(current, next)  # Cost = current move cost + moving to next node cost
             if next not in cost or next_cost < cost[next]:  # If it's not in cost dictionary, or a lower cost
                 cost[next] = next_cost  # it should be looked at
-                priority = next_cost + heuristic(goal, vec(next))   # Prioritise based on movement cost *and* distance
+                priority = next_cost + manhattan_dist(goal, vec(next))  # Set priority for queue based on f+h = g
                 frontier.put(next, priority)
                 path[next] = vec(current) - vec(next)
     return path

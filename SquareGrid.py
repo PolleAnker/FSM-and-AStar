@@ -18,9 +18,6 @@ class SquareGrid:
 
     def find_neighbors(self, node):
         neighbors = [node + connection for connection in self.connections]
-        # Move other way every other time
-        #if(node.x + node.y) % 2:
-        #    neighbors.reverse()
         # Filter out nodes which are out of bounds
         neighbors = filter(self.in_bounds, neighbors)
         # Filter out nodes which are not walkable (obstacles)

@@ -71,23 +71,10 @@ def play():
 
         pg.display.set_caption("Pathfinding Finally Working")
         screen.fill(BLACK)
-        df.draw_grid(LIGHTGRAY, WIDTH, HEIGHT, TILESIZE, screen)
         g.draw_obstacles(LIGHTGRAY, TILESIZE, screen)
-
-        # Colour explored area
-        for node in path:
-            x, y = node
-            rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
-            pg.draw.rect(screen, MEDIUMGRAY, rect)
-
-        # Draw path from the start to the goal
-        current = start + path[pf.vec_to_int(start)]
-        while current != goal:
-            x, y = current
-            rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
-            pg.draw.rect(screen, PATHCOLOR, rect)
-            # Find the next entry in the path
-            current = current + path[pf.vec_to_int(current)]
+        df.draw_grid(LIGHTGRAY, WIDTH, HEIGHT, TILESIZE, screen)
+        df.draw_explored_area(path, MEDIUMGRAY, TILESIZE, screen)
+        df.draw_path(path, start, goal, PATHCOLOR, TILESIZE, screen)
         df.draw_icons(start, goal, TILESIZE, BLUE, LIGHTBLUE, screen)
         pg.display.flip()
 
