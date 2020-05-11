@@ -1,5 +1,6 @@
 import pygame as pg
 import Pathfinding as pf
+import time
 
 # Draw start and end position for player
 def draw_icons(startPoint, endPoint, tilesize, startRectColour, endRectColour, screen):
@@ -35,3 +36,16 @@ def draw_path(path, start, goal, colour, tilesize, screen):
         rect = pg.Rect(x * tilesize, y * tilesize, tilesize, tilesize)     # Create a Rect object with proper dimensions
         pg.draw.rect(screen, colour, rect)                                 # Draw the Rect object in colour on screen
         current = current + path[pf.vec_to_int(current)]                   # Find the next entry in the path
+
+
+def path_to_list(path, start, end):
+    # Turns the path Dictionary into a list of pygame.math.Vector2 instead
+    current = start
+    path_list = []
+    # Fill list with all parts of the path
+    while current != end:
+        path_list.append(current)
+        current = current + path[pf.vec_to_int(current)]
+    # Make sure to add the end node at the end of the function (not done in the while loop
+    path_list.append(end)
+    return path_list

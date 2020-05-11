@@ -2,6 +2,7 @@ import pygame as pg
 import SquareGrid as sg
 import drawFunctions as df
 import Pathfinding as pf
+import time
 
 vec = pg.math.Vector2
 
@@ -41,8 +42,10 @@ def play():
     for obstacle in obstacles:
         g.obstacles.append(vec(obstacle))
     goal = vec(14, 8)
-    start = vec(20, 0)
+    start = vec(14, 8)
+    current_pos = start
     path = pf.a_star(g, goal, start)
+    path_list = df.path_to_list(path, start, goal)
 
     running = True
     while running:
@@ -68,14 +71,34 @@ def play():
                 if event.button == 3:
                     goal = mpos
                 path = pf.a_star(g, goal, start)
+                path_list = df.path_to_list(path, start, goal)
 
         pg.display.set_caption("Pathfinding Finally Working")
         screen.fill(BLACK)
         g.draw_obstacles(LIGHTGRAY, TILESIZE, screen)
         df.draw_grid(LIGHTGRAY, WIDTH, HEIGHT, TILESIZE, screen)
-        df.draw_explored_area(path, MEDIUMGRAY, TILESIZE, screen)
-        df.draw_path(path, start, goal, PATHCOLOR, TILESIZE, screen)
-        df.draw_icons(start, goal, TILESIZE, BLUE, LIGHTBLUE, screen)
+        #df.draw_explored_area(path, MEDIUMGRAY, TILESIZE, screen)
+        #df.draw_path(path, start, goal, PATHCOLOR, TILESIZE, screen)
+        #df.draw_icons(start, goal, TILESIZE, BLUE, LIGHTBLUE, screen)
+
+        while current_pos != goal:
+            for current_pos in path_list:
+                x, y = current_pos
+                screen.fill(BLACK)
+                g.draw_obstacles(LIGHTGRAY, TILESIZE, screen)
+                df.draw_grid(LIGHTGRAY, WIDTH, HEIGHT, TILESIZE, screen)
+                current_pos_rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
+                pg.draw.rect(screen, BLUE, current_pos_rect)
+                pg.display.flip()
+                time.sleep(1)
+                print("Not quite there yet")
+                if current_pos == goal:
+                    print("Arrived at destination!")
+                    start = current_pos
+
+        x, y = start
+        start_rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
+        pg.draw.rect(screen, BLUE, start_rect)
         pg.display.flip()
 
 

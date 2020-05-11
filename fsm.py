@@ -1,6 +1,7 @@
 from enum import Enum
 from time import sleep
 import random
+import Pathfinding as pf
 
 
 class States(Enum):
@@ -28,9 +29,11 @@ class Agent:
         # use A* algorithm to move to Player position (get player as target as well)
         return target
 
-    def patrol(self, point1, point2):
-        # use A* algorithm to move between two given points
-        return point1, point2
+    def patrol(self, map, point1, point2):
+        # use A* algorithm to calculate path between the two points
+        patrol_path = pf.a_star(map, point1, point2)
+        print(patrol_path)
+        # use move function (when written) to move between the points - reverse move when end is reached
 
 
 agent = Agent()
