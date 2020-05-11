@@ -49,3 +49,27 @@ def path_to_list(path, start, end):
     # Make sure to add the end node at the end of the function (not done in the while loop
     path_list.append(end)
     return path_list
+
+
+def draw_movement(grid, path_list, start_position, end_position, ambient_colour,
+                  bg_colour, character_colour, width, height, tilesize, screen):
+    while start_position != end_position:
+        for start_position in path_list:
+            x, y = start_position
+            grid.draw_obstacles(ambient_colour, tilesize, screen)
+            draw_grid(ambient_colour, width, height, tilesize, screen)
+            current_pos_rect = pg.Rect(x * tilesize, y * tilesize, tilesize, tilesize)
+            pg.draw.rect(screen, character_colour, current_pos_rect)
+
+            pg.display.flip()
+
+            old_position = start_position
+            old_x, old_y = old_position
+            old_position_rect = pg.Rect(old_x * tilesize, old_y * tilesize, tilesize, tilesize)
+            pg.draw.rect(screen, bg_colour, old_position_rect)
+
+            time.sleep(0.50)
+
+            if start_position == end_position:
+                returned_position = start_position
+                return returned_position
