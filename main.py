@@ -3,6 +3,7 @@ import SquareGrid as sg
 import drawFunctions as df
 import Pathfinding as pf
 import time
+from threading import Thread
 
 vec = pg.math.Vector2
 
@@ -17,6 +18,7 @@ LIGHTGRAY = (140, 140, 140)
 MEDIUMGRAY = (70, 70, 70)
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
+RED = (255, 0, 0)
 LIGHTBLUE = (0, 255, 255)
 PATHCOLOR = (140, 140, 200)
 
@@ -47,6 +49,12 @@ def play():
     path = pf.a_star(g, goal, start)
     path_list = df.path_to_list(path, start, goal)
 
+    goal2 = vec(0, 0)
+    start2 = vec(10, 9)
+    current_pos2 = start2
+    path2 = pf.a_star(g, goal2, start2)
+    path_list2 = df.path_to_list(path2, start2, goal2)
+
     running = True
     while running:
         clock.tick(FPS)
@@ -57,7 +65,7 @@ def play():
                 if event.key == pg.K_ESCAPE:
                     running = False
                 if event.key == pg.K_m:
-                    # dump the wall list for saving
+                    # "Save" the list of walls, so it can be copy pasted
                     print([(int(loc.x), int(loc.y)) for loc in g.walls])
             if event.type == pg.MOUSEBUTTONDOWN:
                 mpos = vec(pg.mouse.get_pos()) // TILESIZE
@@ -77,24 +85,11 @@ def play():
         screen.fill(BLACK)
         g.draw_obstacles(LIGHTGRAY, TILESIZE, screen)
         df.draw_grid(LIGHTGRAY, WIDTH, HEIGHT, TILESIZE, screen)
-        #df.draw_explored_area(path, MEDIUMGRAY, TILESIZE, screen)
-        #df.draw_path(path, start, goal, PATHCOLOR, TILESIZE, screen)
-        #df.draw_icons(start, goal, TILESIZE, BLUE, LIGHTBLUE, screen)
 
-        while current_pos != goal:
-            for current_pos in path_list:
-                x, y = current_pos
-                screen.fill(BLACK)
-                g.draw_obstacles(LIGHTGRAY, TILESIZE, screen)
-                df.draw_grid(LIGHTGRAY, WIDTH, HEIGHT, TILESIZE, screen)
-                current_pos_rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
-                pg.draw.rect(screen, BLUE, current_pos_rect)
-                pg.display.flip()
-                time.sleep(1)
-                print("Not quite there yet")
-                if current_pos == goal:
-                    print("Arrived at destination!")
-                    start = current_pos
+        new_path_list = df.draw_movement(g, path_list, start, goal, LIGHTGRAY,
+                                         BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
+        if new_path_list is not None:
+            start = new_path_list
 
         x, y = start
         start_rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
@@ -105,3 +100,24 @@ def play():
 if __name__ == '__main__':
     play()
 
+'''
+# This used to be the loop for drawing movement before df.draw_movement() existed
+while current_pos != goal:
+    print(start)
+    print(current_pos)
+    print(goal)
+    for current_pos in path_list:
+        x, y = current_pos
+        screen.fill(BLACK)
+        g.draw_obstacles(LIGHTGRAY, TILESIZE, screen)
+        df.draw_grid(LIGHTGRAY, WIDTH, HEIGHT, TILESIZE, screen)
+        current_pos_rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
+        pg.draw.rect(screen, BLUE, current_pos_rect)
+        pg.display.flip()
+        time.sleep(0.50)
+        if current_pos == goal:
+            start = current_pos
+            print(start)
+            print(current_pos)
+            print(goal)
+'''
