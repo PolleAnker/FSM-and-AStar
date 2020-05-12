@@ -4,7 +4,7 @@ import drawFunctions as df
 import Pathfinding as pf
 import time
 from threading import Thread
-import fsm as fuck
+import fsm
 
 vec = pg.math.Vector2
 
@@ -48,15 +48,13 @@ def play():
     print("Setting up")
     goal = vec(14, 8)
     start = vec(14, 8)
-    current_pos = start
     path = pf.a_star(g, goal, start)
     path_list = df.path_to_list(path, start, goal)
 
+    agent_1 = fsm.Agent()
     goal2 = vec(0, 0)
     start2 = vec(1, 9)
-    current_pos2 = start2
-    path2 = pf.a_star(g, goal2, start2)
-    path_list2 = df.path_to_list(path2, start2, goal2)
+    path2 = agent_1.behaviour(g, start2, goal2, start)
 
     running = True
     while running:
@@ -82,9 +80,9 @@ def play():
                 if event.button == 3:
                     goal = mpos
                 path = pf.a_star(g, goal, start)
+                print(path)
                 path_list = df.path_to_list(path, start, goal)
-                path2 = pf.a_star(g, goal2, start2)
-                path_list2 = df.path_to_list(path2, start2, goal2)
+                path2 = agent_1.behaviour(g, goal2, start2, start)
 
         pg.display.set_caption("Pathfinding Finally Working")
         screen.fill(BLACK)
@@ -98,28 +96,19 @@ def play():
             path = pf.a_star(g, start, goal)
             path_list = df.path_to_list(path, start, goal)
 
-        a1 = fuck.Agent()
-        a1.behaviour(g, start2, goal2, start)
-        path_list2 = a1.behaviour(g, start2, goal2, start)
-        #print(path_list2)
-        #path_list2 = df.path_to_list(path2, start2, goal2)
+
+        path2 = agent_1.behaviour(g, goal2, start2, start)
+        path_list2 = df.path_to_list(path2, start2, goal2)
         df.draw_movement_wack(g, path_list2, start2, goal2, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen, 0.25)
+        if goal2 != start:
+            goal2 = start
 
 
-        """""""""
-        if path_list2 and path_list2[-1] is not None:
-            print("Setting start to path_list[-1]")
-            start2 = path_list2[-1]
-            path_list2.reverse()
-        """""""""
 
         #df.draw_path(path, start, goal, BLUE, TILESIZE, screen)
 
         #df.draw_path(path2, start2, goal2, RED, TILESIZE, screen)
 
-        x, y = start
-        #start_rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
-        #pg.draw.rect(screen, BLUE, start_rect)
         pg.display.flip()
 
 
