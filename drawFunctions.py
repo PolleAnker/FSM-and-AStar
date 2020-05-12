@@ -56,7 +56,7 @@ def path_to_list(path, start, end):
   # Fill list with all parts of the path
   while current != end:
     path_list.append(current)
-    print(current)
+    print(f'It is the current value of {current}') #this a pygame.math.Vector2
     current = current + path[pf.vec_to_int(current)]
   # Make sure to add the end node at the end of the function (not done in the while loop
   path_list.append(end)

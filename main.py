@@ -88,7 +88,8 @@ def play():
         screen.fill(BLACK)
         g.draw_obstacles(LIGHTGRAY, TILESIZE, screen)
         df.draw_grid(LIGHTGRAY, WIDTH, HEIGHT, TILESIZE, screen)
-        df.draw_movement_wack(g, path_list, start, goal, LIGHTGRAY, BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
+        t1 = Thread(target=df.draw_movement_wack, args=[g, path_list, start, goal, LIGHTGRAY, BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5])
+        #df.draw_movement_wack(g, path_list, start, goal, LIGHTGRAY, BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
         if path_list and path_list[-1] is not None:
             print("Setting start to path_list[-1]")
             start = path_list[-1]
@@ -99,17 +100,20 @@ def play():
 
         path2 = agent_1.behaviour(g, goal2, start2, start)
         path_list2 = df.path_to_list(path2, start2, goal2)
+        t2 = Thread(target=df.draw_movement_wack,
+                    args=[g, path_list, start2, goal2, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen, 0.25])
         df.draw_movement_wack(g, path_list2, start2, goal2, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen, 0.25)
         if goal2 != start:
             goal2 = start
 
-
+        t1.start()
+        #t2.start()
 
         #df.draw_path(path, start, goal, BLUE, TILESIZE, screen)
 
         #df.draw_path(path2, start2, goal2, RED, TILESIZE, screen)
 
-        pg.display.flip()
+        #pg.display.flip()
 
 
 if __name__ == '__main__':
