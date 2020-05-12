@@ -38,17 +38,29 @@ def draw_path(path, start, goal, colour, tilesize, screen):
         current = current + path[pf.vec_to_int(current)]                   # Find the next entry in the path
     return current
 
+def NOT_path_to_list(path, start, end):
+  current = start
+  path_list = []
+
+  while current!= end:
+    path_list.append(current)
+    current = current + path[pf.vec_to_int(current)]
+  path_list.append(end)
+  return path_list
+
+
 def path_to_list(path, start, end):
-    # Turns the path Dictionary into a list of pygame.math.Vector2 instead
-    current = start
-    path_list = []
-    # Fill list with all parts of the path
-    while current != end:
-        path_list.append(current)
-        current = current + path[pf.vec_to_int(current)]
-    # Make sure to add the end node at the end of the function (not done in the while loop
-    path_list.append(end)
-    return path_list
+  # Turns the path Dictionary into a list of pygame.math.Vector2 instead
+  current = start
+  path_list = []
+  # Fill list with all parts of the path
+  while current != end:
+    path_list.append(current)
+    print(current)
+    current = current + path[pf.vec_to_int(current)]
+  # Make sure to add the end node at the end of the function (not done in the while loop
+  path_list.append(end)
+  return path_list
 
 
 def draw_movement(grid, path_list, start_position, end_position, ambient_colour,

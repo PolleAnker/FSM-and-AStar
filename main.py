@@ -4,6 +4,7 @@ import drawFunctions as df
 import Pathfinding as pf
 import time
 from threading import Thread
+import fsm as fuck
 
 vec = pg.math.Vector2
 
@@ -52,7 +53,7 @@ def play():
     path_list = df.path_to_list(path, start, goal)
 
     goal2 = vec(0, 0)
-    start2 = vec(10, 9)
+    start2 = vec(1, 9)
     current_pos2 = start2
     path2 = pf.a_star(g, goal2, start2)
     path_list2 = df.path_to_list(path2, start2, goal2)
@@ -97,22 +98,28 @@ def play():
             path = pf.a_star(g, start, goal)
             path_list = df.path_to_list(path, start, goal)
 
+        a1 = fuck.Agent()
+        a1.behaviour(g, start2, goal2, start)
+        path_list2 = a1.behaviour(g, start2, goal2, start)
+        #print(path_list2)
+        #path_list2 = df.path_to_list(path2, start2, goal2)
         df.draw_movement_wack(g, path_list2, start2, goal2, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen, 0.25)
+
+
+        """""""""
         if path_list2 and path_list2[-1] is not None:
             print("Setting start to path_list[-1]")
             start2 = path_list2[-1]
-            path_list2.clear()
-            path2 = pf.a_star(g, start2, goal2)
-            path_list2 = df.path_to_list(path2, start2, goal2)
-
+            path_list2.reverse()
+        """""""""
 
         #df.draw_path(path, start, goal, BLUE, TILESIZE, screen)
 
         #df.draw_path(path2, start2, goal2, RED, TILESIZE, screen)
 
         x, y = start
-        start_rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
-        pg.draw.rect(screen, BLUE, start_rect)
+        #start_rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
+        #pg.draw.rect(screen, BLUE, start_rect)
         pg.display.flip()
 
 
