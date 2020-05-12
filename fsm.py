@@ -21,20 +21,45 @@ class Agent:
     def get_state(self):
         return self.__state
 
-    def attack(self, target):
-        # while in attack range of player execute an attack function
-        return target
+    def attack(self, my_pos, enemy_pos):
+        print("I'm gonna kill you!!")
+        if pf.manhattan_dist(my_pos, enemy_pos) > 20:
+            self.set_state(States.CHASING)
 
-    def chase(self, target):
+    def chase(self, map, my_pos, enemy_pos):
         # use A* algorithm to move to Player position (get player as target as well)
-        return target
+        print("I'm gonna get you!")
+        chase_path = pf.a_star(map, my_pos, enemy_pos)
+        # Probably want the movement function here
+        if pf.manhattan_dist(my_pos, enemy_pos) > 60:
+            self.set_state(States.PATROLLING)
+            print("Huh, must've been the wind")
+        elif pf.manhattan_dist(my_pos, enemy_pos) < 20:
+            self.set_state(States.ATTACKING)
+            print("Got you now!")
+        return chase_path
 
-    def patrol(self, map, point1, point2):
+    def patrol(self, map, my_position, patrol_goal, enemy_pos):
         # use A* algorithm to calculate path between the two points
-        patrol_path = pf.a_star(map, point1, point2)
-        print(patrol_path)
-        # use move function (when written) to move between the points - reverse move when end is reached
+        print("*whistling jolly tune*")
+        patrol_path = pf.a_star(map, my_position, patrol_goal)
+        # Probably want the movement function here
+        if pf.manhattan_dist(my_position, enemy_pos) < 60:
+            self.set_state(States.CHASING)
+        return patrol_path
 
+    def behaviour(self, map, my_position, patrol_goal, enemy_pos):
+        if self.get_state() == States.PATROLLING:  # If agent is patrolling, do patrol stuff
+            while self.get_state() == States.PATROLLING:
+                self.patrol(map, my_position, patrol_goal, enemy_pos)
+
+        elif self.get_state() == States.CHASING:  # If agent is chasing, do chase stuff
+            while agent.get_state() == States.CHASING:
+                self.chase(map, my_position, enemy_pos)
+
+        elif self.get_state() == States.ATTACKING:  # If agent is attacking, do attack stuff
+            while self.get_state() == States.ATTACKING:
+                self.attack(my_position, enemy_pos)
 
 agent = Agent()
 while True:
@@ -49,29 +74,5 @@ while True:
     if changeTo == 2:
         agent.set_state(States.ATTACKING)
 
-# The commented stuff below is the actual logic for the Agent
-'''
-This is the actual logic that we should use when the A* algorithm is also written
-agent = Agent() # Create instance of agent
-
-if agent.get_state() == States.PATROLLING:    # If agent is patrolling, do patrol stuff
-    while agent.get_state() == States.PATROLLING:
-        agent.patrol()
-        # if a player gets in chase range:
-        #   agent.set_state(States.CHASING)
-        
-elif agent.get_state() == States.CHASING:     # If agent is chasing, do chase stuff
-    while agent.get_state() == States.CHASING:
-        agent.chase()
-        # if a player is in attack range:
-        #   agent.set_state(States.ATTACKING)
-        # if a player is out of chase range:
-        #   agent.set_state(States.PATROLLING)
-        
-elif agent.get_state() == States.ATTACKING:   # If agent is attacking, do attack stuff
-    while agent.get_state() == States.ATTACKING:
-        agent.attack()
-    # if a player is out of attack range:
-    #   agent.chase()
-
-'''
+    # I think this is how we'll be calling it in main.py
+    #agent.behaviour(grid, start2, goal2, start)
