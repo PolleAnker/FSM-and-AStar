@@ -43,6 +43,8 @@ def play():
                  (5, 3), (6, 3), (5, 4)]
     for obstacle in obstacles:
         g.obstacles.append(vec(obstacle))
+
+    print("Setting up")
     goal = vec(14, 8)
     start = vec(14, 8)
     current_pos = start
@@ -87,16 +89,26 @@ def play():
         screen.fill(BLACK)
         g.draw_obstacles(LIGHTGRAY, TILESIZE, screen)
         df.draw_grid(LIGHTGRAY, WIDTH, HEIGHT, TILESIZE, screen)
-
-        df.draw_movement(g, path_list, start, goal, LIGHTGRAY,
-                                         BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
-        if path_list[-1] is not None:
+        df.draw_movement_wack(g, path_list, start, goal, LIGHTGRAY, BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
+        if path_list and path_list[-1] is not None:
+            print("Setting start to path_list[-1]")
             start = path_list[-1]
+            path_list.clear()
+            path = pf.a_star(g, start, goal)
+            path_list = df.path_to_list(path, start, goal)
 
-        df.draw_movement(g, path_list2, start2, goal2, LIGHTGRAY,
-                                         BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
-        if path_list2[-1] is not None:
+        df.draw_movement_wack(g, path_list2, start2, goal2, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen, 0.25)
+        if path_list2 and path_list2[-1] is not None:
+            print("Setting start to path_list[-1]")
             start2 = path_list2[-1]
+            path_list2.clear()
+            path2 = pf.a_star(g, start2, goal2)
+            path_list2 = df.path_to_list(path2, start2, goal2)
+
+
+        #df.draw_path(path, start, goal, BLUE, TILESIZE, screen)
+
+        #df.draw_path(path2, start2, goal2, RED, TILESIZE, screen)
 
         x, y = start
         start_rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)

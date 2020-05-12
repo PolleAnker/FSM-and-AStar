@@ -74,3 +74,26 @@ def draw_movement(grid, path_list, start_position, end_position, ambient_colour,
 
             # Wait for some time
             time.sleep(speed)
+
+def draw_movement_wack(grid, path_list, start_position, end_position, ambient_colour,
+                  bg_colour, character_colour, width, height, tilesize, screen, speed):
+    for start_position in path_list:
+        # Redraw grid and obstacles to not remove the grid in places we've drawn
+        grid.draw_obstacles(ambient_colour, tilesize, screen)
+        draw_grid(ambient_colour, width, height, tilesize, screen)
+
+        # Draw a rectangle at the current position
+        x, y = start_position
+        current_pos_rect = pg.Rect(x * tilesize, y * tilesize, tilesize, tilesize)
+        pg.draw.rect(screen, character_colour, current_pos_rect)
+
+        pg.display.flip()
+
+        # Fill in the old position with the background colour
+        old_position = start_position
+        old_x, old_y = old_position
+        old_position_rect = pg.Rect(old_x * tilesize, old_y * tilesize, tilesize, tilesize)
+        pg.draw.rect(screen, bg_colour, old_position_rect)
+
+        # Wait for some time
+        time.sleep(speed)
