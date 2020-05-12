@@ -66,7 +66,7 @@ def play():
                     running = False
                 if event.key == pg.K_m:
                     # "Save" the list of walls, so it can be copy pasted
-                    print([(int(loc.x), int(loc.y)) for loc in g.walls])
+                    print([(int(loc.x), int(loc.y)) for loc in g.obstacles])
             if event.type == pg.MOUSEBUTTONDOWN:
                 mpos = vec(pg.mouse.get_pos()) // TILESIZE
                 if event.button == 1:
@@ -80,16 +80,23 @@ def play():
                     goal = mpos
                 path = pf.a_star(g, goal, start)
                 path_list = df.path_to_list(path, start, goal)
+                path2 = pf.a_star(g, goal2, start2)
+                path_list2 = df.path_to_list(path2, start2, goal2)
 
         pg.display.set_caption("Pathfinding Finally Working")
         screen.fill(BLACK)
         g.draw_obstacles(LIGHTGRAY, TILESIZE, screen)
         df.draw_grid(LIGHTGRAY, WIDTH, HEIGHT, TILESIZE, screen)
 
-        new_path_list = df.draw_movement(g, path_list, start, goal, LIGHTGRAY,
+        df.draw_movement(g, path_list, start, goal, LIGHTGRAY,
                                          BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
-        if new_path_list is not None:
-            start = new_path_list
+        if path_list[-1] is not None:
+            start = path_list[-1]
+
+        df.draw_movement(g, path_list2, start2, goal2, LIGHTGRAY,
+                                         BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
+        if path_list2[-1] is not None:
+            start2 = path_list2[-1]
 
         x, y = start
         start_rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
