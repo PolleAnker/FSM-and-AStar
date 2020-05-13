@@ -2,8 +2,6 @@ import pygame as pg
 import SquareGrid as sg
 import drawFunctions as df
 import Pathfinding as pf
-import time
-from threading import Thread
 import fsm
 
 vec = pg.math.Vector2
@@ -22,6 +20,8 @@ BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 LIGHTBLUE = (0, 255, 255)
 PATHCOLOR = (140, 140, 200)
+
+start_chase = vec(0, 0)
 
 
 def play():
@@ -52,8 +52,8 @@ def play():
     path_list = df.path_to_list(path, start, goal)
 
     agent_1 = fsm.Agent()
-    goal2 = vec(6, 9)
-    start2 = vec(8, 9)
+    goal2 = vec(25, 9)
+    start2 = vec(1, 9)
 
     running = True
     while running:
@@ -79,76 +79,49 @@ def play():
                 if event.button == 3:
                     goal = mpos
                 path = pf.a_star(g, goal, start)
-                print(path)
+                #print(path)
                 path_list = df.path_to_list(path, start, goal)
 
         pg.display.set_caption("Pathfinding Finally Working")
         screen.fill(BLACK)
         g.draw_obstacles(LIGHTGRAY, TILESIZE, screen)
         df.draw_grid(LIGHTGRAY, WIDTH, HEIGHT, TILESIZE, screen)
-        #t1 = Thread(target=df.draw_movement_wack, args=[g, path_list, start, goal, LIGHTGRAY, BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5])
-        df.draw_movement_wack(g, path_list, start, goal, LIGHTGRAY, BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
+        df.draw_movement(agent_1, g, path_list, start, goal, start, LIGHTGRAY, BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
         if path_list and path_list[-1] is not None:
-            print("Setting start to path_list[-1]")
+            #print("Setting start to path_list[-1]")
             start = path_list[-1]
             path_list.clear()
             path = pf.a_star(g, start, goal)
             path_list = df.path_to_list(path, start, goal)
 
-
         if agent_1.get_state() == fsm.States.PATROLLING:
             agent_1.patrol(start2, start)
             patrol_path = pf.a_star(g, start2, goal2)
             patrol_path_list = df.path_to_list(patrol_path, goal2, start2)
-            df.draw_movement_wack(g, patrol_path_list, start2, goal2, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen,
+            start_chase = df.draw_movement(agent_1, g, patrol_path_list, start2, goal2, start, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen,
                                   0.25)
+            if(start_chase != vec(0,0)):
+              #print("Amma Change Motherfucker")
+              agent_1.set_state(fsm.States.CHASING)
+            #print(start_chase)
             start2 = patrol_path_list[0]
             goal2 = patrol_path_list[-1]
-        elif agent_1.get_state() == fsm.States.CHASING:
-            agent_1.chase(start2, start)
-            chase_path = pf.a_star(g, start, start2)
-            chase_path_list = df.path_to_list(chase_path, start2, start)
-            df.draw_movement_wack(g, chase_path_list, start2, goal2, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen,
-                                  0.25)
-            if pf.manhattan_dist(start, start2) < 20:
-                agent_1.set_state(fsm.States.ATTACKING)
-        elif agent_1.get_state() == fsm.States.ATTACKING:
-            agent_1.attack(start2, start)
+            #print(start_chase)
 
-        t2 = Thread(target=df.draw_movement_wack,
-                    args=[g, path_list, start2, goal2, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen, 0.25])
-
-        #t1.start()
-        #t2.start()
-
-        #df.draw_path(path, start, goal, BLUE, TILESIZE, screen)
-
-        #df.draw_path(path2, start2, goal2, RED, TILESIZE, screen)
-
-        #pg.display.flip()
-
+            if agent_1.get_state() == fsm.States.CHASING:
+                #print("I got here to chasing")
+                #start_chase = start2
+                #print(f'This is start chase {start_chase}')
+                agent_1.chase(start_chase, start)
+                chase_path = pf.a_star(g, start, start_chase)
+                chase_path_list = df.path_to_list(chase_path, start_chase, start)
+                df.draw_movement(agent_1, g, chase_path_list, start_chase, goal2, start, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen,
+                                      0.1)
+                if pf.manhattan_dist(start, start_chase) < 10:
+                    agent_1.set_state(fsm.States.ATTACKING)
+            elif agent_1.get_state() == fsm.States.ATTACKING:
+                agent_1.attack(start2, start)
 
 if __name__ == '__main__':
     play()
 
-'''
-# This used to be the loop for drawing movement before df.draw_movement() existed
-while current_pos != goal:
-    print(start)
-    print(current_pos)
-    print(goal)
-    for current_pos in path_list:
-        x, y = current_pos
-        screen.fill(BLACK)
-        g.draw_obstacles(LIGHTGRAY, TILESIZE, screen)
-        df.draw_grid(LIGHTGRAY, WIDTH, HEIGHT, TILESIZE, screen)
-        current_pos_rect = pg.Rect(x * TILESIZE, y * TILESIZE, TILESIZE, TILESIZE)
-        pg.draw.rect(screen, BLUE, current_pos_rect)
-        pg.display.flip()
-        time.sleep(0.50)
-        if current_pos == goal:
-            start = current_pos
-            print(start)
-            print(current_pos)
-            print(goal)
-'''
