@@ -12,7 +12,7 @@ class States(Enum):
     ATTACKING = 2
 
 
-class Agent(Thread):
+class Agent():
     def __init__(self):
         self.__state = States.PATROLLING
 
@@ -24,50 +24,39 @@ class Agent(Thread):
 
     def attack(self, my_pos, enemy_pos):
         print("I'm gonna kill you!!")
-        if pf.manhattan_dist(my_pos, enemy_pos) > 20:
-            self.set_state(States.CHASING)
-            return None
 
-    def chase(self, map, my_pos, enemy_pos):
+
+    def chase(self, my_pos, enemy_pos):
         # use A* algorithm to move to Player position (get player as target as well)
         print("I'm gonna get you!")
-        chase_path = pf.a_star(map, my_pos, enemy_pos)
         # Probably want the movement function here
         if pf.manhattan_dist(my_pos, enemy_pos) > 60:
             self.set_state(States.PATROLLING)
             print("Huh, must've been the wind")
-        elif pf.manhattan_dist(my_pos, enemy_pos) < 20:
+        elif pf.manhattan_dist(my_pos, enemy_pos) < 0:
             self.set_state(States.ATTACKING)
             print("Got you now!")
-        return chase_path
 
-    def patrol(self, map, my_position, patrol_goal, enemy_pos):
+    def patrol(self, my_position, enemy_pos):
         # use A* algorithm to calculate path between the two points
         print("*whistling jolly tune*")
-        patrol_path = pf.a_star(map, my_position, patrol_goal)
         # Probably want the movement function here
         if pf.manhattan_dist(my_position, enemy_pos) < 60:
             self.set_state(States.CHASING)
-        return patrol_path
 
     def behaviour(self, map, my_position, patrol_goal, enemy_pos):
         if self.get_state() == States.PATROLLING:  # If agent is patrolling, do patrol stuff
             while self.get_state() == States.PATROLLING:
-              print("I'm patrolling yay, this is my behaviour")
-              patrol_list_path = self.patrol(map, my_position, patrol_goal, enemy_pos)
-              print(patrol_list_path)
-              return patrol_list_path
+                self.patrol(map, my_position, patrol_goal, enemy_pos)
 
 
         elif self.get_state() == States.CHASING:  # If agent is chasing, do chase stuff
             while self.get_state() == States.CHASING:
-              print("I'm chasing yay, this is my behaviour")
-              return self.chase(map, my_position, enemy_pos)
+                self.chase(map, my_position, enemy_pos)
 
         elif self.get_state() == States.ATTACKING:  # If agent is attacking, do attack stuff
             while self.get_state() == States.ATTACKING:
-              print("I'm patrolling yay, this is my behaviour")
-              return self.attack(my_position, enemy_pos)
+                self.attack(my_position, enemy_pos)
 
 """""""""
 agent = Agent()

@@ -52,9 +52,8 @@ def play():
     path_list = df.path_to_list(path, start, goal)
 
     agent_1 = fsm.Agent()
-    goal2 = vec(0, 0)
-    start2 = vec(1, 9)
-    path2 = agent_1.behaviour(g, start2, goal2, start)
+    goal2 = vec(6, 9)
+    start2 = vec(8, 9)
 
     running = True
     while running:
@@ -82,14 +81,13 @@ def play():
                 path = pf.a_star(g, goal, start)
                 print(path)
                 path_list = df.path_to_list(path, start, goal)
-                path2 = agent_1.behaviour(g, goal2, start2, start)
 
         pg.display.set_caption("Pathfinding Finally Working")
         screen.fill(BLACK)
         g.draw_obstacles(LIGHTGRAY, TILESIZE, screen)
         df.draw_grid(LIGHTGRAY, WIDTH, HEIGHT, TILESIZE, screen)
-        t1 = Thread(target=df.draw_movement_wack, args=[g, path_list, start, goal, LIGHTGRAY, BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5])
-        #df.draw_movement_wack(g, path_list, start, goal, LIGHTGRAY, BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
+        #t1 = Thread(target=df.draw_movement_wack, args=[g, path_list, start, goal, LIGHTGRAY, BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5])
+        df.draw_movement_wack(g, path_list, start, goal, LIGHTGRAY, BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
         if path_list and path_list[-1] is not None:
             print("Setting start to path_list[-1]")
             start = path_list[-1]
@@ -98,15 +96,29 @@ def play():
             path_list = df.path_to_list(path, start, goal)
 
 
-        path2 = agent_1.behaviour(g, goal2, start2, start)
-        path_list2 = df.path_to_list(path2, start2, goal2)
+        if agent_1.get_state() == fsm.States.PATROLLING:
+            agent_1.patrol(start2, start)
+            patrol_path = pf.a_star(g, start2, goal2)
+            patrol_path_list = df.path_to_list(patrol_path, goal2, start2)
+            df.draw_movement_wack(g, patrol_path_list, start2, goal2, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen,
+                                  0.25)
+            start2 = patrol_path_list[0]
+            goal2 = patrol_path_list[-1]
+        elif agent_1.get_state() == fsm.States.CHASING:
+            agent_1.chase(start2, start)
+            chase_path = pf.a_star(g, start, start2)
+            chase_path_list = df.path_to_list(chase_path, start2, start)
+            df.draw_movement_wack(g, chase_path_list, start2, goal2, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen,
+                                  0.25)
+            if pf.manhattan_dist(start, start2) < 20:
+                agent_1.set_state(fsm.States.ATTACKING)
+        elif agent_1.get_state() == fsm.States.ATTACKING:
+            agent_1.attack(start2, start)
+
         t2 = Thread(target=df.draw_movement_wack,
                     args=[g, path_list, start2, goal2, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen, 0.25])
-        df.draw_movement_wack(g, path_list2, start2, goal2, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen, 0.25)
-        if goal2 != start:
-            goal2 = start
 
-        t1.start()
+        #t1.start()
         #t2.start()
 
         #df.draw_path(path, start, goal, BLUE, TILESIZE, screen)
