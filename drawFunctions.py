@@ -50,9 +50,8 @@ def draw_movement(agent, grid, path_list, start_position, end_position, enemy_po
         if pf.manhattan_dist(enemy_pos, start_position) < 60 and agent.get_state() == fsm.States.PATROLLING:
           return start_position
 
-        if pf.manhattan_dist(enemy_pos, start_position) < 10 and agent.get_state() == fsm.States.CHASING:
-          agent.set_state(fsm.States.ATTACKING)
-          break
+        if pf.manhattan_dist(enemy_pos, start_position) < 20 and agent.get_state() == fsm.States.CHASING:
+          return start_position
 
         # Redraw grid and obstacles to not remove the grid in places we've drawn
         grid.draw_obstacles(ambient_colour, tilesize, screen)
