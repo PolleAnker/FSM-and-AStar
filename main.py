@@ -46,14 +46,14 @@ def play():
         g.obstacles.append(vec(obstacle))
 
     print("Setting up")
-    goal = vec(14, 8)
-    start = vec(14, 8)
-    path = pf.a_star(g, goal, start)
-    path_list = df.path_to_list(path, start, goal)
+    player_goal = vec(0, 0)
+    player_position = vec(0, 0)
+    path = pf.a_star(g, player_goal, player_position)
+    path_list = df.path_to_list(path, player_position, player_goal)
 
     agent_1 = fsm.Agent()
-    goal2 = vec(25, 9)
-    start2 = vec(1, 9)
+    patrol_goal = vec(25, 9)
+    patrol_start = vec(1, 9)
 
     running = True
     while running:
@@ -74,53 +74,46 @@ def play():
                         g.obstacles.remove(mpos)
                     else:
                         g.obstacles.append(mpos)
-                if event.button == 2:
-                    start = mpos
                 if event.button == 3:
-                    goal = mpos
-                path = pf.a_star(g, goal, start)
-                #print(path)
-                path_list = df.path_to_list(path, start, goal)
+                    player_goal = mpos
+                path = pf.a_star(g, player_goal, player_position)
+                path_list = df.path_to_list(path, player_position, player_goal)
 
         pg.display.set_caption("Pathfinding Finally Working")
         screen.fill(BLACK)
         g.draw_obstacles(LIGHTGRAY, TILESIZE, screen)
         df.draw_grid(LIGHTGRAY, WIDTH, HEIGHT, TILESIZE, screen)
-        df.draw_movement(agent_1, g, path_list, start, goal, start, LIGHTGRAY, BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
-        if path_list and path_list[-1] is not None:
-            #print("Setting start to path_list[-1]")
-            start = path_list[-1]
-            path_list.clear()
-            path = pf.a_star(g, start, goal)
-            path_list = df.path_to_list(path, start, goal)
 
+        # Draw the player's path from its position (player_position) to the set goal
+        df.draw_movement(agent_1, g, path_list, player_position, player_goal, player_position, LIGHTGRAY, BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
+        if path_list and path_list[-1] is not None:
+            player_position = path_list[-1]
+            path_list.clear()
+            path = pf.a_star(g, player_position, player_goal)
+            path_list = df.path_to_list(path, player_position, player_goal)
+
+        # Draw and control states of agent_1
         if agent_1.get_state() == fsm.States.PATROLLING:
-            agent_1.patrol(start2, start)
-            patrol_path = pf.a_star(g, start2, goal2)
-            patrol_path_list = df.path_to_list(patrol_path, goal2, start2)
-            start_chase = df.draw_movement(agent_1, g, patrol_path_list, start2, goal2, start, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen,
+            agent_1.patrol(patrol_start, player_position)
+            patrol_path = pf.a_star(g, patrol_start, patrol_goal)
+            patrol_path_list = df.path_to_list(patrol_path, patrol_goal, patrol_start)
+            start_chase = df.draw_movement(agent_1, g, patrol_path_list, patrol_start, patrol_goal, player_position, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen,
                                   0.25)
-            if(start_chase != vec(0,0)):
-              #print("Amma Change Motherfucker")
-              agent_1.set_state(fsm.States.CHASING)
-            #print(start_chase)
-            start2 = patrol_path_list[0]
-            goal2 = patrol_path_list[-1]
-            #print(start_chase)
+            if start_chase != vec(0,0) and start_chase != None:
+                agent_1.set_state(fsm.States.CHASING)
+            patrol_start = patrol_path_list[0]
+            patrol_goal = patrol_path_list[-1]
 
             if agent_1.get_state() == fsm.States.CHASING:
-                #print("I got here to chasing")
-                #start_chase = start2
-                #print(f'This is start chase {start_chase}')
-                agent_1.chase(start_chase, start)
-                chase_path = pf.a_star(g, start, start_chase)
-                chase_path_list = df.path_to_list(chase_path, start_chase, start)
-                df.draw_movement(agent_1, g, chase_path_list, start_chase, goal2, start, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen,
+                agent_1.chase(start_chase, player_position)
+                chase_path = pf.a_star(g, player_position, start_chase)
+                chase_path_list = df.path_to_list(chase_path, start_chase, player_position)
+                df.draw_movement(agent_1, g, chase_path_list, start_chase, patrol_goal, player_position, LIGHTGRAY, BLACK, RED, WIDTH, HEIGHT, TILESIZE, screen,
                                       0.1)
-                if pf.manhattan_dist(start, start_chase) < 10:
+                if pf.manhattan_dist(player_position, start_chase) < 10:
                     agent_1.set_state(fsm.States.ATTACKING)
             elif agent_1.get_state() == fsm.States.ATTACKING:
-                agent_1.attack(start2, start)
+                agent_1.attack(patrol_start, player_position)
 
 if __name__ == '__main__':
     play()

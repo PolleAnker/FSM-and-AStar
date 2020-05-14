@@ -39,16 +39,3 @@ class Agent:
         # Probably want the movement function here
         if pf.manhattan_dist(my_position, enemy_pos) < 60:
             self.set_state(States.CHASING)
-
-    def behaviour(self, map, my_position, patrol_goal, enemy_pos):
-        if self.get_state() == States.PATROLLING:  # If agent is patrolling, do patrol stuff
-            while self.get_state() == States.PATROLLING:
-                self.patrol(map, my_position, patrol_goal, enemy_pos)
-
-        elif self.get_state() == States.CHASING:  # If agent is chasing, do chase stuff
-            while self.get_state() == States.CHASING:
-                self.chase(map, my_position, enemy_pos)
-
-        elif self.get_state() == States.ATTACKING:  # If agent is attacking, do attack stuff
-            while self.get_state() == States.ATTACKING:
-                self.attack(my_position, enemy_pos)
