@@ -20,11 +20,12 @@ class Agent:
         return self.__state
 
     def attack(self, my_pos, enemy_pos):
-        print("I'm gonna kill you!!")
+        print("Got you!")
 
     def chase(self, my_pos, enemy_pos):
         # use A* algorithm to move to Player position (get player as target as well)
-        print("I'm gonna get you!")
+        print("I see you! I'm gonna get you!")
+        print("Activate super Speed!")
         # Probably want the movement function here
         if pf.manhattan_dist(my_pos, enemy_pos) > 60:
             self.set_state(States.PATROLLING)

@@ -3,6 +3,7 @@ import SquareGrid as sg
 import drawFunctions as df
 import Pathfinding as pf
 import fsm
+import os
 
 vec = pg.math.Vector2
 
@@ -25,6 +26,10 @@ start_chase = vec(0, 0)
 
 
 def play():
+    x_screen = 500
+    y_screen = 150
+    os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x_screen, y_screen)
+
     pg.init()
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     clock = pg.time.Clock()
@@ -93,6 +98,7 @@ def play():
     running = True
     while running:
         clock.tick(FPS)
+        # Events for making more walls and getting player input
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
@@ -110,10 +116,11 @@ def play():
                     else:
                         g.obstacles.append(mpos)
                 if event.button == 3:
+                    print("Shhh! I'm moving")
                     player_goal = mpos
                 path = pf.a_star(g, player_goal, player_position)
-                path_list = df.path_to_list(path, player_position, player_goal)
-
+                path_list = df.path_to_list(path, player_position, player_goal) #
+        # Pygame "level" drawing of obstacles and grid
         pg.display.set_caption("Pathfinding Finally Working")
         screen.fill(BLACK)
         g.draw_obstacles(LIGHTGRAY, TILESIZE, screen)
@@ -123,7 +130,6 @@ def play():
         df.draw_movement(agent_1, g, path_list, player_position, player_goal, patrol_start, LIGHTGRAY, BLACK, BLUE, WIDTH, HEIGHT, TILESIZE, screen, 0.5)
         if path_list and path_list[-1] is not None:
             player_position = path_list[-1]
-            path_list.clear()
             path = pf.a_star(g, player_position, player_goal)
             path_list = df.path_to_list(path, player_position, player_goal)
 
