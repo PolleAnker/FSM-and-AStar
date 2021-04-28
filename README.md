@@ -6,4 +6,4 @@ The showcase is rather simple, with a red square indicating an enemy patrolling 
 while a blue rectangle indicating the player can be moved by right clicking somewhere on the black ground.
 The light gray rectangles indicate "walls" which cannot be passed, and the move is executed with that in mind.
 
-![](Images/output_move.PNG)
+![](images/output_move.PNG)
